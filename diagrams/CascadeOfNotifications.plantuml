@@ -1,0 +1,73 @@
+@startuml CascadeOfNotifications
+
+skinparam componentStyle rectangle
+
+title
+UserDemand - Fault Management
+end title
+
+actor USER as USER
+
+package "Cascade of Notifications" {
+  interface GUI as GUI
+  USER - GUI #Lightgrey
+
+  component [Netcool\n] as Netcool
+  GUI - Netcool #Lightgrey
+
+  component [NetcoolProxy\n] as NCP
+  Netcool --[hidden] NCP
+
+  component [MicroWaveDeviceInventory\n] as MWDI
+  NCP --[hidden] MWDI
+
+  component [NotificationProxy\n] as NP
+  MWDI --[hidden] NP
+
+  component [OpenDaylight\n] as ODL
+  NP --[hidden] ODL
+
+  component [Ericsson\nMediator] as EMed
+  ODL --[hidden] EMed
+
+  component [Huawei\nMediator] as HMed
+  ODL --[hidden] HMed
+
+  component [SIAE\nMediator] as SMed
+  ODL --[hidden] SMed
+
+  component [Ericsson\nDevice] as EDev
+  EMed --[hidden] EDev
+
+  component [Huawei\nDevice] as HDev
+  HMed --[hidden] HDev
+
+  component [SIAE\nDevice] as SDev
+  SMed --[hidden] SDev
+
+  NCP --> Netcool #line:blue;text:blue : REST\nWebHook
+
+  MWDI --> NCP #line:blue;text:blue : REST\nWebHook
+
+  NP --> MWDI : REST\nWebHook
+
+  NP --> ODL : RESTCONF
+  NP <.. ODL
+
+  ODL --> EMed
+  ODL <.. EMed
+  ODL --> HMed
+  ODL <.. HMed
+  ODL --> SMed : NETCONF
+  ODL <.. SMed
+
+  EMed --> EDev : SNMP
+  EMed <.. EDev
+  HMed --> HDev : Qx
+  HMed <.. HDev
+  SMed --> SDev : SNMP
+  SMed <.. SDev
+
+}
+
+@enduml

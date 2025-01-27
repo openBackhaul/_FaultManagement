@@ -1,0 +1,54 @@
+@startuml InitialUpload
+
+skinparam componentStyle rectangle
+
+title
+UserDemand - Fault Management
+end title
+
+actor USER as USER
+
+package "Initial Inventory Upload" {
+  interface GUI as GUI
+  USER - GUI #Lightgrey
+
+  component [Netcool\n] as Netcool
+  GUI - Netcool #Lightgrey
+
+  component [NetcoolProxy\n] as NCP
+  Netcool --[hidden] NCP
+
+  component [MicroWaveDeviceInventory\n] as MWDI
+  NCP --[hidden] MWDI
+
+  component [NotificationProxy\n] as NP
+  MWDI --[hidden] NP
+
+  component [OpenDaylight\n] as ODL
+  NP --[hidden] ODL
+
+  component [Mediator\n] as Med
+  ODL --[hidden] Med
+
+  component [Device\n] as Dev
+  Med --[hidden] Dev
+
+  NP <-- ODL : (1)
+  MWDI <-- NP : (2)
+
+  NCP --> Netcool #line:blue;text:blue : REST\nWebHook
+
+  MWDI --> NCP #line:blue;text:blue : REST\nWebHook
+
+  MWDI --> ODL : (3)\nGET CC
+  MWDI <.. ODL
+
+  ODL --> Med
+  ODL <.. Med
+
+  Med --> Dev
+  Med <.. Dev
+
+}
+
+@enduml
